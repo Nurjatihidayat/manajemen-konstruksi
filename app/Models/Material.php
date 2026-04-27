@@ -10,22 +10,17 @@ class Material extends Model
     use HasFactory;
 
     protected $fillable = [
-        'project_id',
+        'kode_material',
         'nama_material',
+        'satuan',
         'jumlah_tersedia',
-        'jumlah_kebutuhan',
-        'kekurangan'
+        'min_stock',
+        'max_stock',
+        'reorder_point'
     ];
 
-    protected static function booted()
+    public function projectMaterials()
     {
-        static::saving(function ($material) {
-            $material->kekurangan = $material->jumlah_kebutuhan - $material->jumlah_tersedia;
-        });
-    }
-
-    public function project()
-    {
-        return $this->belongsTo(Project::class);
+        return $this->hasMany(ProjectMaterial::class);
     }
 }

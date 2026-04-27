@@ -27,7 +27,15 @@ class MaterialController extends Controller
             'jumlah_kebutuhan' => 'required|integer|min:0',
         ]);
 
-        $project->materials()->create($request->all());
+        $material = Material::firstOrCreate(
+            ['nama_material' => $request->nama_material],
+            ['jumlah_tersedia' => $request->jumlah_tersedia]
+        );
+
+        $project->projectMaterials()->updateOrCreate(
+            ['material_id' => $material->id],
+            ['jumlah_kebutuhan' => $request->jumlah_kebutuhan]
+        );
 
         ActivityLog::create([
             'user_id' => auth()->id(),
@@ -40,6 +48,10 @@ class MaterialController extends Controller
     public function edit(Project $project, Material $material)
     {
         $this->authorizeMaterialAction($project);
+
+        $projectMaterial = $project->projectMaterials()->where('material_id', $material->id)->firstOrFail();
+        $material->jumlah_kebutuhan = $projectMaterial->jumlah_kebutuhan;
+
         return view('materials.edit', compact('project', 'material'));
     }
 
@@ -53,7 +65,17 @@ class MaterialController extends Controller
             'jumlah_kebutuhan' => 'required|integer|min:0',
         ]);
 
-        $material->update($request->all());
+        $material->update([
+            'nama_material' => $request->nama_material,
+            'jumlah_tersedia' => $request->jumlah_tersedia,
+        ]);
+
+        $projectMaterial = $project->projectMaterials()->where('material_id', $material->id)->first();
+        if ($projectMaterial) {
+            $projectMaterial->update([
+                'jumlah_kebutuhan' => $request->jumlah_kebutuhan
+            ]);
+        }
 
         ActivityLog::create([
             'user_id' => auth()->id(),
@@ -68,7 +90,8 @@ class MaterialController extends Controller
         $this->authorizeMaterialAction($project);
 
         $nama = $material->nama_material;
-        $material->delete();
+        
+        $project->projectMaterials()->where('material_id', $material->id)->delete();
 
         ActivityLog::create([
             'user_id' => auth()->id(),

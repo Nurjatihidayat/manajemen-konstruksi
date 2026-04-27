@@ -23,6 +23,34 @@
                         {{ __('Manajemen User') }}
                     </x-nav-link>
                     @endif
+                    @if(Auth::user()->role == 'manajer' || Auth::user()->role == 'admin' || Auth::user()->role == 'gudang')
+                    <x-nav-link :href="route('material-requests.index')" :active="request()->routeIs('material-requests.*')">
+                        {{ __('Permintaan Material') }}
+                    </x-nav-link>
+                    @endif
+                    @if(Auth::user()->role == 'admin' || Auth::user()->role == 'gudang')
+                    <x-nav-link :href="route('master-materials.index')" :active="request()->routeIs('master-materials.*')">
+                        {{ __('Master Material') }}
+                    </x-nav-link>
+                    
+                    @if(Auth::user()->role == 'admin')
+                    <x-nav-link :href="route('analytics.index')" :active="request()->routeIs('analytics.index')">
+                        {{ __('Analytics') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('activity-logs.index')" :active="request()->routeIs('activity-logs.*')">
+                        {{ __('Audit Log') }}
+                    </x-nav-link>
+                    @endif
+                    <x-nav-link :href="route('suppliers.index')" :active="request()->routeIs('suppliers.*')">
+                        {{ __('Supplier') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('purchase-orders.index')" :active="request()->routeIs('purchase-orders.*')">
+                        {{ __('Purchase Order') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('stock-opnames.index')" :active="request()->routeIs('stock-opnames.*')">
+                        {{ __('Stock Opname') }}
+                    </x-nav-link>
+                    @endif
                 </div>
             </div>
 

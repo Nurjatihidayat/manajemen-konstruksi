@@ -65,59 +65,34 @@
                         <div class="overflow-x-auto" x-data="{ openModal: null, materialId: null, materialName: '' }">
                             <table class="w-full text-left font-sans">
                                 <thead class="bg-gray-50">
-                                    <tr>
-                                        <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Material</th>
-                                        <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Tersedia</th>
-                                        <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Kebutuhan</th>
+                                                                          <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Material</th>
+                                        <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Stok Lokasi</th>
+                                        <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Sedang Dikirim</th>
+                                        <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Rencana</th>
                                         <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Kekurangan</th>
-                                        <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Status</th>
                                         <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-50">
-                                    @forelse($project->materials as $material)
+                                    @forelse($project->projectMaterials as $pm)
                                     <tr class="hover:bg-indigo-50/30 transition-colors">
-                                        <td class="px-6 py-4 font-black text-gray-900">{{ $material->nama_material }}</td>
-                                        <td class="px-6 py-4 text-center font-bold">{{ $material->jumlah_tersedia }}</td>
-                                        <td class="px-6 py-4 text-center text-gray-500">{{ $material->jumlah_kebutuhan }}</td>
+                                        <td class="px-6 py-4 font-black text-gray-900">{{ $pm->material->nama_material }}</td>
+                                        <td class="px-6 py-4 text-center font-black text-indigo-600">{{ $pm->jumlah_tersedia }} <span class="text-[8px] text-gray-400">{{ $pm->material->satuan }}</span></td>
+                                        <td class="px-6 py-4 text-center font-bold text-amber-500">{{ $pm->jumlah_dialokasikan }}</td>
+                                        <td class="px-6 py-4 text-center text-gray-400">{{ $pm->jumlah_kebutuhan }}</td>
                                         <td class="px-6 py-4 text-center">
-                                            <span class="font-black {{ $material->kekurangan > 0 ? 'text-red-500' : 'text-emerald-500' }}">
-                                                {{ $material->kekurangan }}
+                                            <span class="font-black {{ $pm->sisa_kebutuhan > 0 ? 'text-red-500' : 'text-emerald-500' }}">
+                                                {{ $pm->sisa_kebutuhan }}
                                             </span>
-                                        </td>
-                                        <td class="px-6 py-4 text-center">
-                                            @if($material->kekurangan > 0)
-                                            <span class="inline-flex items-center px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-red-100 text-red-700">KRITIKAL</span>
-                                            @else
-                                            <span class="inline-flex items-center px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-emerald-100 text-emerald-700">AMAN</span>
-                                            @endif
                                         </td>
                                         <td class="px-6 py-4">
                                             <div class="flex items-center justify-center space-x-2">
-                                                @if(Auth::user()->role == 'gudang' || Auth::user()->role == 'admin')
-                                                    <button @click="openModal = 'order'; materialId = {{ $material->id }}; materialName = '{{ $material->nama_material }}'" 
-                                                        class="p-2 bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white rounded-xl transition">
-                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                                                    </button>
-                                                    <button @click="openModal = 'stock_in'; materialId = {{ $material->id }}; materialName = '{{ $material->nama_material }}'" 
-                                                        class="p-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white rounded-xl transition">
-                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                                                    </button>
-                                                    <button @click="openModal = 'dispatch'; materialId = {{ $material->id }}; materialName = '{{ $material->nama_material }}'" 
-                                                        class="p-2 bg-amber-50 text-amber-600 hover:bg-amber-600 hover:text-white rounded-xl transition">
-                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
-                                                    </button>
-                                                @endif
-
-                                                @if(Auth::user()->role == 'admin' || 
-                                                   (Auth::user()->role == 'manajer' && $project->manager_id == auth()->id()) ||
-                                                   (Auth::user()->role == 'gudang' && $project->id == Auth::user()->assigned_project_id))
-                                                    <a href="{{ route('projects.materials.edit', [$project, $material]) }}" class="p-2 bg-gray-50 text-gray-600 hover:bg-gray-600 hover:text-white rounded-xl transition">
+                                                @if(Auth::user()->role == 'admin' || (Auth::user()->role == 'manajer' && $project->manager_id == auth()->id()))
+                                                    <a href="{{ route('projects.materials.edit', [$project, $pm->material->id]) }}" class="p-2 bg-gray-50 text-gray-600 hover:bg-gray-600 hover:text-white rounded-xl transition">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                                                     </a>
-                                                    <form action="{{ route('projects.materials.destroy', [$project, $material]) }}" method="POST" onsubmit="return confirm('Hapus material ini?')">
-                                                        @csrf
-                                                        @method('DELETE')
+                                                    <form action="{{ route('projects.materials.destroy', [$project, $pm->material->id]) }}" method="POST" onsubmit="return confirm('Hapus material ini dari proyek?')">
+                                                        @csrf @method('DELETE')
                                                         <button type="submit" class="p-2 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-xl transition">
                                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                                         </button>
@@ -127,9 +102,7 @@
                                         </td>
                                     </tr>
                                     @empty
-                                    <tr>
-                                        <td colspan="6" class="px-6 py-12 text-center text-gray-400 font-bold italic uppercase tracking-widest">-- Data Kosong --</td>
-                                    </tr>
+                                    <tr><td colspan="6" class="px-6 py-12 text-center text-gray-400 font-bold italic uppercase tracking-widest">-- Belum ada material direncanakan --</td></tr>
                                     @endforelse
                                 </tbody>
                             </table>
@@ -183,6 +156,134 @@
                 </div>
             </div>
 
+            <!-- Progress Update Form (Manager) -->
+            @if(Auth::user()->role == 'manajer' && $project->manager_id == auth()->id() || Auth::user()->role == 'admin')
+            <div class="bg-white overflow-hidden shadow-2xl rounded-3xl border border-gray-100" x-data="{ open: false }">
+                <div class="p-8">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-xl font-black text-indigo-900 uppercase tracking-tighter">📈 Update Progres & Pemakaian Material</h3>
+                        <button @click="open = !open" class="bg-indigo-50 text-indigo-700 hover:bg-indigo-100 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition">
+                            <span x-text="open ? 'TUTUP' : 'UPDATE SEKARANG'">UPDATE SEKARANG</span>
+                        </button>
+                    </div>
+                    <div x-show="open" x-transition class="mt-6 border-t border-gray-50 pt-6">
+                        <form action="{{ route('projects.progress.store', $project) }}" method="POST" enctype="multipart/form-data">
+                            @csrf
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Persentase Progres (%) <span class="text-red-500">*</span></label>
+                                    <input type="number" name="progress_percentage" required min="0" max="100" value="{{ $project->progres }}"
+                                        class="w-full bg-gray-50 border-transparent rounded-2xl focus:ring-indigo-500 focus:bg-white shadow-inner transition">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Tanggal Update <span class="text-red-500">*</span></label>
+                                    <input type="date" name="date" required value="{{ date('Y-m-d') }}"
+                                        class="w-full bg-gray-50 border-transparent rounded-2xl focus:ring-indigo-500 focus:bg-white shadow-inner transition">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Deskripsi Pekerjaan <span class="text-red-500">*</span></label>
+                                    <textarea name="description" required rows="2" class="w-full bg-gray-50 border-transparent rounded-2xl focus:ring-indigo-500 focus:bg-white shadow-inner transition" placeholder="Apa yang dikerjakan hari ini?"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Material Usage Section -->
+                            <div class="bg-slate-50 p-6 rounded-3xl mb-6">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h4 class="text-xs font-black text-indigo-900 uppercase tracking-widest">📦 Pemakaian Material Hari Ini</h4>
+                                    <button type="button" id="addUsageItem" class="text-[10px] font-black text-indigo-600 uppercase tracking-widest hover:text-indigo-900">+ Tambah Material</button>
+                                </div>
+                                <div id="usageContainer" class="space-y-3"></div>
+                            </div>
+
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Foto Dokumentasi</label>
+                                    <input type="file" name="photo" accept="image/*" class="text-xs text-gray-400">
+                                </div>
+                                <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg shadow-indigo-200 transition transform hover:-translate-y-1">
+                                    SIMPAN LAPORAN
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <script>
+                const projectMaterials = @json($project->projectMaterials->load('material'));
+                let usageIdx = 0;
+                function addUsageRow() {
+                    const container = document.getElementById('usageContainer');
+                    const div = document.createElement('div');
+                    div.className = 'grid grid-cols-12 gap-3 items-end bg-white p-3 rounded-2xl shadow-sm border border-gray-100';
+                    div.innerHTML = `
+                        <div class="col-span-7">
+                            <select name="materials[${usageIdx}][material_id]" class="w-full border-transparent bg-gray-50 rounded-xl text-xs focus:ring-indigo-500">
+                                <option value="">-- Pilih Material --</option>
+                                ${projectMaterials.map(pm => `<option value="${pm.material_id}">${pm.material.nama_material} (Tersedia: ${pm.jumlah_tersedia} ${pm.material.satuan})</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="col-span-3">
+                            <input type="number" name="materials[${usageIdx}][quantity]" placeholder="Qty" class="w-full border-transparent bg-gray-50 rounded-xl text-xs focus:ring-indigo-500">
+                        </div>
+                        <div class="col-span-2 flex justify-end">
+                            <button type="button" class="remove-usage text-red-400 hover:text-red-600 transition">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                    div.querySelector('.remove-usage').onclick = () => div.remove();
+                    usageIdx++;
+                }
+                document.getElementById('addUsageItem').onclick = addUsageRow;
+            </script>
+            @endif
+
+            <!-- Progress History -->
+            <div class="bg-white overflow-hidden shadow-2xl rounded-3xl border border-gray-100">
+                <div class="p-8">
+                    <h3 class="text-xl font-black text-indigo-900 uppercase tracking-tighter mb-8 pb-4 border-b border-gray-50">🕒 Riwayat Update & Pemakaian</h3>
+                    <div class="space-y-8">
+                        @forelse($project->progressUpdates as $update)
+                        <div class="flex gap-6 relative">
+                            <div class="flex flex-col items-center">
+                                <div class="w-3 h-3 rounded-full bg-indigo-600 ring-4 ring-indigo-50"></div>
+                                <div class="w-0.5 flex-1 bg-gray-100 my-1"></div>
+                            </div>
+                            <div class="flex-1 pb-8">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="text-sm font-black text-gray-800">{{ $update->date }} <span class="text-[10px] text-gray-400 font-bold uppercase ml-2">— {{ $update->progress_percentage }}%</span></h4>
+                                </div>
+                                <p class="text-xs text-gray-600 italic mb-4">"{{ $update->description }}"</p>
+                                
+                                @if($update->photo_path)
+                                <div class="mb-4">
+                                    <img src="{{ asset('storage/' . $update->photo_path) }}" class="w-48 rounded-2xl shadow-lg border border-gray-100">
+                                </div>
+                                @endif
+
+                                @if($update->materialUsages->count() > 0)
+                                <div class="bg-gray-50 p-4 rounded-2xl inline-block min-w-[300px]">
+                                    <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">Material Digunakan:</p>
+                                    <ul class="space-y-1">
+                                        @foreach($update->materialUsages as $usage)
+                                        <li class="text-[11px] font-bold text-gray-700 flex justify-between">
+                                            <span>{{ $usage->material->nama_material }}</span>
+                                            <span class="text-indigo-600">{{ $usage->quantity_used }} {{ $usage->material->satuan }}</span>
+                                        </li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                                @endif
+                            </div>
+                        </div>
+                        @empty
+                        <p class="text-center py-8 text-gray-400 font-bold italic uppercase tracking-widest">-- Belum ada riwayat update --</p>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+
             <div class="flex justify-start">
                 <a href="{{ route('projects.index') }}" class="text-[10px] font-black text-indigo-400 hover:text-indigo-900 flex items-center transition uppercase tracking-widest">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
@@ -193,3 +294,4 @@
         </div>
     </div>
 </x-app-layout>
+

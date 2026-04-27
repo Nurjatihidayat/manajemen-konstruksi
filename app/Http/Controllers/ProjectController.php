@@ -58,7 +58,7 @@ class ProjectController extends Controller
 
     public function show(string $id)
     {
-        $project = Project::with(['materials', 'manager'])->findOrFail($id);
+        $project = Project::with(['projectMaterials.material', 'manager'])->findOrFail($id);
 
         if (auth()->user()->role == 'gudang' && $project->id != auth()->user()->assigned_project_id) {
             abort(403, 'Akses ditolak. Anda tidak ditugaskan di proyek ini.');

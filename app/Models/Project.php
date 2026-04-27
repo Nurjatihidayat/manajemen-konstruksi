@@ -19,13 +19,18 @@ class Project extends Model
         'progres'
     ];
 
-    public function materials()
+    public function projectMaterials()
     {
-        return $this->hasMany(Material::class);
+        return $this->hasMany(ProjectMaterial::class);
     }
 
     public function manager()
     {
         return $this->belongsTo(User::class, 'manager_id');
+    }
+
+    public function progressUpdates()
+    {
+        return $this->hasMany(ProjectProgressUpdate::class)->latest();
     }
 }
